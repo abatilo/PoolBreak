@@ -26,15 +26,20 @@ package com.thoughtbacon.poolbreak;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.throughbacon.poolbreak.sounddetector.SoundDetector;
 
 import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
 
 public class MainActivity extends ActionBarActivity {
+    final String LOG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,16 @@ public class MainActivity extends ActionBarActivity {
         final int bufferSize = AudioUtility.getBufferSize();
 
         AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, bufferSize, 0);
+
+        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
+                Log.d(LOG, "" + pitchDetectionResult.getPitch());
+            }
+        };
+
+        //dispatcher.addAudioProcessor(new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, sampleRate, bufferSize, pdh));
+
         dispatcher.addAudioProcessor(soundDetector.getSilenceDetector());
         dispatcher.addAudioProcessor(soundDetector);
 
