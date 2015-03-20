@@ -1,8 +1,18 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="PoolBreakTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/PoolBreakActionBar</item>
+    </style>
+
+    <!-- Action Bar Style -->
+    <style name="PoolBreakActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/green_500</item>
+        <item name="android:titleTextStyle">@style/PoolBreakActionBar.TitleText</item>
+    </style>
+
+    <!-- Action Bar text style -->
+    <style name="PoolBreakActionBar.TitleText">
+        <item name="android:textColor">@color/white</item>
     </style>
 
 </resources>
