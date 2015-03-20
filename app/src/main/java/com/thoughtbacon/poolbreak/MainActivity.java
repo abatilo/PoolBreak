@@ -24,8 +24,8 @@
 
 package com.thoughtbacon.poolbreak;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +38,7 @@ import be.tarsos.dsp.io.android.AudioDispatcherFactory;
 import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
     final String LOG = MainActivity.class.getSimpleName();
 
     @Override
