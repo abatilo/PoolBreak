@@ -24,6 +24,7 @@
   -->
 
 <resources>
-    <item name="green_500" type="color">#4CAF50</item>
+    <item name="material_green_500" type="color">#4CAF50</item>
+    <item name="material_green_600" type="color">#43A047</item>
     <item name="white" type="color">#FFF</item>
 </resources>

@@ -24,11 +24,15 @@
 
 package com.thoughtbacon.poolbreak;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 
 import com.throughbacon.poolbreak.sounddetector.SoundDetector;
 
@@ -38,8 +42,8 @@ import be.tarsos.dsp.io.android.AudioDispatcherFactory;
 import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 
-public class MainActivity extends Activity {
-    final String LOG = MainActivity.class.getSimpleName();
+public class MainActivity extends ActionBarActivity {
+    final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,7 @@ public class MainActivity extends Activity {
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
-                Log.d(LOG, "" + pitchDetectionResult.getPitch());
+                Log.d(TAG, "" + pitchDetectionResult.getPitch());
             }
         };
 
@@ -65,28 +69,53 @@ public class MainActivity extends Activity {
         dispatcher.addAudioProcessor(soundDetector.getSilenceDetector());
         dispatcher.addAudioProcessor(soundDetector);
 
-        new Thread(dispatcher,"Sound Detector").start();
-    }
+        //new Thread(dispatcher,"Sound Detector").start();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        RelativeLayout setupLayout = (RelativeLayout) findViewById(R.id.setup_layout);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        ImageView ball = (ImageView) findViewById(R.id.cue_ball);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
+
+        setupLayout.setOnTouchListener(new View.OnTouchListener() {
+            float touchStartX = 0;
+            float touchStartY = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    touchStartX = event.getX();
+                    touchStartY = event.getY();
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                }
+                else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    ImageView ball = (ImageView) findViewById(R.id.cue_ball);
+                    float ballStartX = ball.getX();
+                    float ballStartY = ball.getY();
+
+                    float deltaX = event.getX() - touchStartX;
+                    float deltaY = event.getY() - touchStartY;
+                    float ballNewX = ballStartX + deltaX;
+                    float ballNewY = ballStartY + deltaY;
+                    Log.d(TAG, "Moved: (" + deltaX + ", " + deltaY + ")");
+
+                    if (ballNewY < ballStartY)
+                    ball.setX(ballNewX);
+                    ball.setY(ballNewY);
+                    touchStartX = event.getX();
+                    touchStartY = event.getY();
+                }
+                return true;
+            }
+        });
+
+        Spinner sizeSpinner = (Spinner) findViewById(R.id.size_spinner);
+        ArrayAdapter<CharSequence> spinnerAdapter =
+                ArrayAdapter.createFromResource(this,
+                                                R.array.size_values,
+                                                android.R.layout.simple_spinner_dropdown_item);
+        sizeSpinner.setAdapter(spinnerAdapter);
     }
 }

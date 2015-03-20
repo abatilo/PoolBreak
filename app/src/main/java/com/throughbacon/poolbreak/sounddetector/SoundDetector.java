@@ -54,8 +54,7 @@ public class SoundDetector implements AudioProcessor {
     private void handleSound() {
         if (silenceDetector.currentSPL() > threshold) {
             // TODO Have this method store detected noises for velocity calculations
-            //Log.d(TAG, silenceDetector.currentSPL() + "");
-            Log.d(TAG, "" + System.nanoTime());
+            Log.d(TAG, silenceDetector.currentSPL() + "");
         }
     }
 

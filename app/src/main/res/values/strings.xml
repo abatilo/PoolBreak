@@ -2,5 +2,9 @@
     <string name="app_name">PoolBreak</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+
+    <string-array name="size_values">
+        <item>7-ft</item>
+        <item>8-ft</item>
+    </string-array>
 </resources>

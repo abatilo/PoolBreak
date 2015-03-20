@@ -1,18 +1,9 @@
 <resources>
 
-    <style name="PoolBreak.Theme" parent="@android:style/Theme.Holo.Light">
-        <item name="android:actionBarStyle">@style/PoolBreak.Theme.ActionBar</item>
-    </style>
-
-    <!-- Action Bar Style -->
-    <style name="PoolBreak.Theme.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/green_500</item>
-        <item name="android:titleTextStyle">@style/PoolBreak.Theme.ActionBar.TitleText</item>
-    </style>
-
-    <!-- Action Bar text style -->
-    <style name="PoolBreak.Theme.ActionBar.TitleText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/white</item>
+    <style name="PoolBreak.Theme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/material_green_500</item>
+        <item name="colorPrimaryDark">@color/material_green_600</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 
 </resources>
