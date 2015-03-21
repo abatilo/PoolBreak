@@ -53,6 +53,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final DistanceCalculator distanceCalculator = new DistanceCalculator(this, DistanceCalculator.TableType.SEVEN);
+
         SoundDetector soundDetector = new SoundDetector();
 
         final int sampleRate = AudioUtility.getMaxSampleRate();
@@ -76,8 +78,6 @@ public class MainActivity extends ActionBarActivity {
 
         RelativeLayout setupLayout = (RelativeLayout) findViewById(R.id.setup_layout);
 
-        final ImageView ball = (ImageView) findViewById(R.id.cue_ball);
-
         setupLayout.setOnTouchListener(new View.OnTouchListener() {
             ImageView setupTable = (ImageView) findViewById(R.id.image_table);
 
@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                final ImageView ball = (ImageView) findViewById(R.id.cue_ball);
+                final ImageView ball = (ImageView) findViewById(R.id.image_cue_ball);
 
                 final float lowerXBound = setupTable.getLeft() + ball.getWidth();
                 final float upperXBound = setupTable.getRight() - ball.getWidth() * 2;
@@ -135,23 +135,25 @@ public class MainActivity extends ActionBarActivity {
                     touchStartX = event.getX();
                     touchStartY = event.getY();
 
-                    float playWidth = lowerXBound + upperXBound + ball.getWidth();
-                    float pixelsPerInch = playWidth / distance_to_rack;
+                    distanceCalculator.getDistanceFromCueToRack();
 
-                    float rackX = originX;
-                    float rackY = originY - distance_to_rack * pixelsPerInch;
-
-                    Log.d(TAG, "Origin: (" + originX + ", " + originY + ")");
-                    Log.d(TAG, "Cue ball: (" + ballNewX + ", " + ballNewY + ")");
-                    Log.d(TAG, "Rack: (" + originX + ", " + (originY - distance_to_rack * pixelsPerInch) + ")");
-
-                    float deltaX = rackX - ballNewX;
-                    deltaX *= deltaX;
-                    float deltaY = rackY - ballNewY;
-                    deltaY *= deltaY;
-                    float distanceCueToRack = (float)Math.sqrt(deltaX + deltaY);
-
-                    Log.d(TAG, "Distance: " + (distanceCueToRack / pixelsPerInch));
+//                    float playWidth = lowerXBound + upperXBound + ball.getWidth();
+//                    float pixelsPerInch = playWidth / distance_to_rack;
+//
+//                    float rackX = originX;
+//                    float rackY = originY - distance_to_rack * pixelsPerInch;
+//
+//                    Log.d(TAG, "Origin: (" + originX + ", " + originY + ")");
+//                    Log.d(TAG, "Cue ball: (" + ballNewX + ", " + ballNewY + ")");
+//                    Log.d(TAG, "Rack: (" + originX + ", " + (originY - distance_to_rack * pixelsPerInch) + ")");
+//
+//                    float deltaX = rackX - ballNewX;
+//                    deltaX *= deltaX;
+//                    float deltaY = rackY - ballNewY;
+//                    deltaY *= deltaY;
+//                    float distanceCueToRack = (float)Math.sqrt(deltaX + deltaY);
+//
+//                    Log.d(TAG, "Distance: " + (distanceCueToRack / pixelsPerInch));
                 }
                 return true;
             }
