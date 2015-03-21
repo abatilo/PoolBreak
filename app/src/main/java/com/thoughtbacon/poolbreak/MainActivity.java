@@ -135,12 +135,23 @@ public class MainActivity extends ActionBarActivity {
                     touchStartX = event.getX();
                     touchStartY = event.getY();
 
-                    float distance = (float)Math.sqrt(Math.pow(ballNewX - originX, 2) + Math.pow(ballNewY - originY, 2));
+                    float playWidth = lowerXBound + upperXBound + ball.getWidth();
+                    float pixelsPerInch = playWidth / distance_to_rack;
+
+                    float rackX = originX;
+                    float rackY = originY - distance_to_rack * pixelsPerInch;
+
                     Log.d(TAG, "Origin: (" + originX + ", " + originY + ")");
                     Log.d(TAG, "Cue ball: (" + ballNewX + ", " + ballNewY + ")");
-                    float distanceToRack = (float)Math.sqrt(distance_to_rack * distance_to_rack + distance * distance);
-                    float pixelPerInch = ((upperXBound - lowerXBound + ball.getWidth()) / 4) / (distance_to_rack / 4);
-                    Log.d(TAG, "Distance: " + distanceToRack / pixelPerInch);
+                    Log.d(TAG, "Rack: (" + originX + ", " + (originY - distance_to_rack * pixelsPerInch) + ")");
+
+                    float deltaX = rackX - ballNewX;
+                    deltaX *= deltaX;
+                    float deltaY = rackY - ballNewY;
+                    deltaY *= deltaY;
+                    float distanceCueToRack = (float)Math.sqrt(deltaX + deltaY);
+
+                    Log.d(TAG, "Distance: " + (distanceCueToRack / pixelsPerInch));
                 }
                 return true;
             }
