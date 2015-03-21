@@ -45,6 +45,9 @@ import be.tarsos.dsp.pitch.PitchDetectionResult;
 public class MainActivity extends ActionBarActivity {
     final String TAG = MainActivity.class.getSimpleName();
 
+    float originX = 0;
+    float originY = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,12 +76,10 @@ public class MainActivity extends ActionBarActivity {
 
         RelativeLayout setupLayout = (RelativeLayout) findViewById(R.id.setup_layout);
 
-        setupLayout.setOnTouchListener(new View.OnTouchListener() {
-            ImageView ball = (ImageView) findViewById(R.id.cue_ball);
-            ImageView setupTable = (ImageView) findViewById(R.id.image_table);
+        final ImageView ball = (ImageView) findViewById(R.id.cue_ball);
 
-            float originX = ball.getX();
-            float originY = ball.getY();
+        setupLayout.setOnTouchListener(new View.OnTouchListener() {
+            ImageView setupTable = (ImageView) findViewById(R.id.image_table);
 
             float touchStartX = 0;
             float touchStartY = 0;
@@ -86,19 +87,24 @@ public class MainActivity extends ActionBarActivity {
             float deltaX, deltaY;
             float ballNewX, ballNewY;
 
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
+                final ImageView ball = (ImageView) findViewById(R.id.cue_ball);
+
                 final float lowerXBound = setupTable.getLeft() + ball.getWidth();
                 final float upperXBound = setupTable.getRight() - ball.getWidth() * 2;
 
                 final float upperYBound = (setupTable.getBottom() - ball.getHeight()) / 2;
                 final float lowerYBound = setupTable.getHeight() - ball.getHeight() - ball.getWidth();
 
-                final float table_width = 38F;
+                final float distance_to_rack = 38F;
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    Log.d(TAG, (upperXBound - lowerXBound) / 4 + "");
+                    if (originX == 0.0F) {
+                        originX = ball.getX();
+                        originY = ball.getY();
+                    }
                     touchStartX = event.getX();
                     touchStartY = event.getY();
                 }
@@ -130,9 +136,11 @@ public class MainActivity extends ActionBarActivity {
                     touchStartY = event.getY();
 
                     float distance = (float)Math.sqrt(Math.pow(ballNewX - originX, 2) + Math.pow(ballNewY - originY, 2));
-                    float distanceToRack = (float)Math.sqrt(table_width * table_width + distance * distance);
-                    float pixelPerInch = ((upperXBound - lowerXBound) / 4) / (table_width / 4);
-                    Log.d(TAG, distanceToRack / pixelPerInch + "");
+                    Log.d(TAG, "Origin: (" + originX + ", " + originY + ")");
+                    Log.d(TAG, "Cue ball: (" + ballNewX + ", " + ballNewY + ")");
+                    float distanceToRack = (float)Math.sqrt(distance_to_rack * distance_to_rack + distance * distance);
+                    float pixelPerInch = ((upperXBound - lowerXBound + ball.getWidth()) / 4) / (distance_to_rack / 4);
+                    Log.d(TAG, "Distance: " + distanceToRack / pixelPerInch);
                 }
                 return true;
             }
