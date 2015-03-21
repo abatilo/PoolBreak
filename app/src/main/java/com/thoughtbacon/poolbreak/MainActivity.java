@@ -73,39 +73,66 @@ public class MainActivity extends ActionBarActivity {
 
         RelativeLayout setupLayout = (RelativeLayout) findViewById(R.id.setup_layout);
 
-        ImageView ball = (ImageView) findViewById(R.id.cue_ball);
-
-
-
         setupLayout.setOnTouchListener(new View.OnTouchListener() {
+            ImageView ball = (ImageView) findViewById(R.id.cue_ball);
+            ImageView setupTable = (ImageView) findViewById(R.id.image_table);
+
+            float originX = ball.getX();
+            float originY = ball.getY();
+
             float touchStartX = 0;
             float touchStartY = 0;
+            float ballStartX, ballStartY;
+            float deltaX, deltaY;
+            float ballNewX, ballNewY;
+
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                final float lowerXBound = setupTable.getLeft() + ball.getWidth();
+                final float upperXBound = setupTable.getRight() - ball.getWidth() * 2;
+
+                final float upperYBound = (setupTable.getBottom() - ball.getHeight()) / 2;
+                final float lowerYBound = setupTable.getHeight() - ball.getHeight() - ball.getWidth();
+
+                final float table_width = 38F;
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    Log.d(TAG, (upperXBound - lowerXBound) / 4 + "");
                     touchStartX = event.getX();
                     touchStartY = event.getY();
                 }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                }
                 else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    ImageView ball = (ImageView) findViewById(R.id.cue_ball);
-                    float ballStartX = ball.getX();
-                    float ballStartY = ball.getY();
+                    ballStartX = ball.getX();
+                    ballStartY = ball.getY();
 
-                    float deltaX = event.getX() - touchStartX;
-                    float deltaY = event.getY() - touchStartY;
-                    float ballNewX = ballStartX + deltaX;
-                    float ballNewY = ballStartY + deltaY;
-                    Log.d(TAG, "Moved: (" + deltaX + ", " + deltaY + ")");
+                    deltaX = event.getX() - touchStartX;
+                    deltaY = event.getY() - touchStartY;
 
-                    if (ballNewY < ballStartY)
+                    ballNewX = ballStartX + deltaX;
+                    ballNewY = ballStartY + deltaY;
+
+                    if (ballNewX < lowerXBound) {
+                        ballNewX = lowerXBound;
+                    }
+                    if (ballNewX > upperXBound) {
+                        ballNewX = upperXBound;
+                    }
+                    if (ballNewY < upperYBound) {
+                        ballNewY = upperYBound;
+                    }
+                    if (ballNewY > lowerYBound) {
+                        ballNewY = lowerYBound;
+                    }
                     ball.setX(ballNewX);
                     ball.setY(ballNewY);
                     touchStartX = event.getX();
                     touchStartY = event.getY();
+
+                    float distance = (float)Math.sqrt(Math.pow(ballNewX - originX, 2) + Math.pow(ballNewY - originY, 2));
+                    float distanceToRack = (float)Math.sqrt(table_width * table_width + distance * distance);
+                    float pixelPerInch = ((upperXBound - lowerXBound) / 4) / (table_width / 4);
+                    Log.d(TAG, distanceToRack / pixelPerInch + "");
                 }
                 return true;
             }

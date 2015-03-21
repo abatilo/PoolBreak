@@ -14,7 +14,7 @@
         <RelativeLayout
             android:id="@+id/setup_layout"
             android:layout_width="fill_parent"
-            android:layout_height="280dp">
+            android:layout_height="fill_parent">
 
             <ImageView
                 android:id="@+id/image_table"
@@ -30,7 +30,7 @@
                 android:src="@drawable/cue_ball"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:paddingTop="55dp"/>
+                android:paddingTop="65dp"/>
 
         </RelativeLayout>
 
