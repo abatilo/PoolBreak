@@ -24,16 +24,20 @@
 
 package com.thoughtbacon.poolbreak;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.thoughtbacon.poolbreak.BreakRecorder.BreakActivity;
 import com.throughbacon.poolbreak.sounddetector.SoundDetector;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -43,17 +47,16 @@ import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 
 public class MainActivity extends ActionBarActivity {
-    final String TAG = MainActivity.class.getSimpleName();
 
-    float originX = 0;
-    float originY = 0;
+    private final String TAG = MainActivity.class.getSimpleName();
+    public static final String DISTANCE_EXTRA = "distance_extra";
+    private DistanceCalculator mDistanceCalculator;
+    private int mSelectedSpinnerItemIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        final DistanceCalculator distanceCalculator = new DistanceCalculator(this, DistanceCalculator.TableType.SEVEN);
 
         SoundDetector soundDetector = new SoundDetector();
 
@@ -76,94 +79,141 @@ public class MainActivity extends ActionBarActivity {
 
         //new Thread(dispatcher,"Sound Detector").start();
 
+        populateSpinner();
+        setupListeners();
+    }
+
+    //region Prepare UI elements
+
+    /**
+     * Populates the spinner with values from an array in strings.xml
+     */
+    private void populateSpinner() {
+        Spinner sizeSpinner = (Spinner) findViewById(R.id.size_spinner);
+        ArrayAdapter<CharSequence> spinnerAdapter =
+                ArrayAdapter.createFromResource(this,
+                        R.array.size_values,
+                        android.R.layout.simple_spinner_dropdown_item);
+        sizeSpinner.setAdapter(spinnerAdapter);
+    }
+    //endregion
+
+    //region Set UI listeners
+
+    /**
+     * Sets all of the listeners
+     */
+    private void setupListeners() {
+        setupSpinnerListener();
+        setupDragListener();
+        setupButtonListener();
+    }
+
+    /**
+     * Sets the spinner item selected listener
+     */
+    private void setupSpinnerListener() {
+        Spinner sizeSpinner = (Spinner) findViewById(R.id.size_spinner);
+        sizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mSelectedSpinnerItemIndex = position;
+                if (mDistanceCalculator != null) {
+                    mDistanceCalculator.setTableType(mSelectedSpinnerItemIndex);
+                }
+                else if (mDistanceCalculator == null) {
+                    mDistanceCalculator = new DistanceCalculator(MainActivity.this, mSelectedSpinnerItemIndex);
+                    mDistanceCalculator.setTableType(mSelectedSpinnerItemIndex);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    /**
+     * Sets the dragging for cue ball placement
+     */
+    private void setupDragListener() {
         RelativeLayout setupLayout = (RelativeLayout) findViewById(R.id.setup_layout);
-
         setupLayout.setOnTouchListener(new View.OnTouchListener() {
-            ImageView setupTable = (ImageView) findViewById(R.id.image_table);
+            final ImageView ballImage = (ImageView) findViewById(R.id.image_cue_ball);
+            ImageView tableImage = (ImageView) findViewById(R.id.image_table);
 
-            float touchStartX = 0;
-            float touchStartY = 0;
-            float ballStartX, ballStartY;
-            float deltaX, deltaY;
-            float ballNewX, ballNewY;
+            int touchStartX, touchStartY;
+            int ballStartX, ballStartY;
+            int deltaX, deltaY;
+            int ballNewX, ballNewY;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                final ImageView ball = (ImageView) findViewById(R.id.image_cue_ball);
-
-                final float lowerXBound = setupTable.getLeft() + ball.getWidth();
-                final float upperXBound = setupTable.getRight() - ball.getWidth() * 2;
-
-                final float upperYBound = (setupTable.getBottom() - ball.getHeight()) / 2;
-                final float lowerYBound = setupTable.getHeight() - ball.getHeight() - ball.getWidth();
-
-                final float distance_to_rack = 38F;
+                final int leftBound = tableImage.getLeft() + ballImage.getWidth();
+                final int rightBound = tableImage.getRight() - ballImage.getWidth() * 2;
+                final int topBound = (tableImage.getBottom() - ballImage.getHeight()) / 2;
+                final int bottomBound = tableImage.getHeight() - ballImage.getHeight() - ballImage.getWidth();
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (originX == 0.0F) {
-                        originX = ball.getX();
-                        originY = ball.getY();
-                    }
-                    touchStartX = event.getX();
-                    touchStartY = event.getY();
+                    if (mDistanceCalculator == null)
+                        mDistanceCalculator = new DistanceCalculator(MainActivity.this, mSelectedSpinnerItemIndex);
+
+                    touchStartX = (int) event.getX();
+                    touchStartY = (int) event.getY();
                 }
                 else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    ballStartX = ball.getX();
-                    ballStartY = ball.getY();
 
-                    deltaX = event.getX() - touchStartX;
-                    deltaY = event.getY() - touchStartY;
-
+                    ballStartX = (int) ballImage.getX();
+                    ballStartY = (int) ballImage.getY();
+                    deltaX = (int) event.getX() - touchStartX;
+                    deltaY = (int) event.getY() - touchStartY;
                     ballNewX = ballStartX + deltaX;
                     ballNewY = ballStartY + deltaY;
 
-                    if (ballNewX < lowerXBound) {
-                        ballNewX = lowerXBound;
+                    if (ballNewX < leftBound) {
+                        ballNewX = leftBound;
                     }
-                    if (ballNewX > upperXBound) {
-                        ballNewX = upperXBound;
+                    if (ballNewX > rightBound) {
+                        ballNewX = rightBound;
                     }
-                    if (ballNewY < upperYBound) {
-                        ballNewY = upperYBound;
+                    if (ballNewY < topBound) {
+                        ballNewY = topBound;
                     }
-                    if (ballNewY > lowerYBound) {
-                        ballNewY = lowerYBound;
+                    if (ballNewY > bottomBound) {
+                        ballNewY = bottomBound;
                     }
-                    ball.setX(ballNewX);
-                    ball.setY(ballNewY);
-                    touchStartX = event.getX();
-                    touchStartY = event.getY();
-
-                    distanceCalculator.getDistanceFromCueToRack();
-
-//                    float playWidth = lowerXBound + upperXBound + ball.getWidth();
-//                    float pixelsPerInch = playWidth / distance_to_rack;
-//
-//                    float rackX = originX;
-//                    float rackY = originY - distance_to_rack * pixelsPerInch;
-//
-//                    Log.d(TAG, "Origin: (" + originX + ", " + originY + ")");
-//                    Log.d(TAG, "Cue ball: (" + ballNewX + ", " + ballNewY + ")");
-//                    Log.d(TAG, "Rack: (" + originX + ", " + (originY - distance_to_rack * pixelsPerInch) + ")");
-//
-//                    float deltaX = rackX - ballNewX;
-//                    deltaX *= deltaX;
-//                    float deltaY = rackY - ballNewY;
-//                    deltaY *= deltaY;
-//                    float distanceCueToRack = (float)Math.sqrt(deltaX + deltaY);
-//
-//                    Log.d(TAG, "Distance: " + (distanceCueToRack / pixelsPerInch));
+                    ballImage.setX(ballNewX);
+                    ballImage.setY(ballNewY);
+                    touchStartX = (int) event.getX();
+                    touchStartY = (int) event.getY();
+                    mDistanceCalculator.setCueBallLocation(ballNewX, ballNewY);
                 }
                 return true;
             }
         });
-
-        Spinner sizeSpinner = (Spinner) findViewById(R.id.size_spinner);
-        ArrayAdapter<CharSequence> spinnerAdapter =
-                ArrayAdapter.createFromResource(this,
-                                                R.array.size_values,
-                                                android.R.layout.simple_spinner_dropdown_item);
-        sizeSpinner.setAdapter(spinnerAdapter);
     }
+
+    /**
+     * Sets the FAB for starting a new break
+     */
+    private void setupButtonListener() {
+        FloatingActionButton breakButton = (FloatingActionButton) findViewById(R.id.button_break);
+        breakButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDistanceCalculator == null)
+                    mDistanceCalculator = new DistanceCalculator(MainActivity.this, DistanceCalculator.TableType.SEVEN);
+
+                float distance = mDistanceCalculator.getDistanceFromCueToRack();
+
+                Intent breakIntent = new Intent(MainActivity.this, BreakActivity.class);
+                breakIntent.putExtra(DISTANCE_EXTRA, distance);
+                startActivity(breakIntent);
+            }
+        });
+    }
+    //endregion
 }

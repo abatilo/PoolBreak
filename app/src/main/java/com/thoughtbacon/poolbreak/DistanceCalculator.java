@@ -25,6 +25,7 @@
 package com.thoughtbacon.poolbreak;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.widget.ImageView;
 
@@ -54,29 +55,44 @@ public class DistanceCalculator {
         public static final int EIGHT = 1;
 
         /**
-         * Represents a 9ft pool table.
+         * Represents a "pro" 8ft pool table.
          */
-        public static final int NINE = 2;
+        public static final int PRO_EIGHT = 2;
 
         /**
-         * The actual distance in inches for a 7ft table.
+         * Represents a 9ft pool table.
+         */
+        public static final int NINE = 3;
+
+        /**
+         * The actual distance in inches for a 7ft table from origin to rack
          */
         private static final int DISTANCE_SEVEN = 39;
 
         /**
-         * The actual distance in inches for an 8ft table.
+         * The actual distance in inches for an 8ft table from origin to rack
          */
         private static final int DISTANCE_EIGHT = 44;
 
         /**
-         * The actual distance in inches for a 9ft table.
+         * The actual distance in inches for a pro 8ft table from origin to rack
+         */
+        private static final int DISTANCE_PRO_EIGHT = 46;
+
+        /**
+         * The actual distance in inches for a 9ft table from origin to rack
          */
         private static final int DISTANCE_NINE = 50;
 
         /**
          * The distances of all the table types by index matching their static definitions.
          */
-        private static final int[] Distance = { DISTANCE_SEVEN, DISTANCE_EIGHT, DISTANCE_NINE };
+        private static final int[] Distance = {
+                DISTANCE_SEVEN,
+                DISTANCE_EIGHT,
+                DISTANCE_PRO_EIGHT,
+                DISTANCE_NINE
+        };
     };
 
     /**
@@ -152,8 +168,8 @@ public class DistanceCalculator {
     private float mDistanceFromCueToRack  = -1.0f;
     //endregion
 
-    public DistanceCalculator(final Activity inActivity, final int inTableType) {
-        mActivity = inActivity;
+    public DistanceCalculator(final Context inContext, final int inTableType) {
+        mActivity = (Activity)inContext;
         ballImage = (ImageView) mActivity.findViewById(R.id.image_cue_ball);
         tableImage = (ImageView) mActivity.findViewById(R.id.image_table);
         mDistanceOriginToRack = TableType.Distance[inTableType];
@@ -188,9 +204,12 @@ public class DistanceCalculator {
      * Sets the origin member variable Point
      */
     private void setOriginMember() {
+
         Logger.Write(TAG, "Setting origin point");
-        mOriginX = mBallX;
-        mOriginY = mBallY;
+        mOriginX = (int) ballImage.getX();
+        Logger.Write(TAG, "mOriginX: " + mOriginX);
+        mOriginY = (int) ballImage.getY();
+        Logger.Write(TAG, "mOriginY: " + mOriginY);
         mOriginPoint = new Point(mOriginX, mOriginY);
     }
 
@@ -199,8 +218,10 @@ public class DistanceCalculator {
      */
     private void setRackMember() {
         Logger.Write(TAG, "Setting rack point");
-        mRackX = mOriginX;
-        mRackY = mOriginY - mDistanceOriginToRack * getPixelsPerInch();
+        mRackX = mOriginPoint.x;
+        Logger.Write(TAG, "mRackX: " + mRackX);
+        mRackY = mOriginPoint.y - mDistanceOriginToRack * getPixelsPerInch();
+        Logger.Write(TAG, "mRackY: " + mRackY);
         mRackPoint = new Point(mRackX, mRackY);
     }
     //endregion
@@ -259,7 +280,7 @@ public class DistanceCalculator {
         distanceFromCueToRack = (float)Math.sqrt(deltaX + deltaY);
 
         //Convert from pixels to inches
-        distanceFromCueToRack /= mPixelsPerInch;
+        distanceFromCueToRack /= (float)mPixelsPerInch;
 
         return distanceFromCueToRack;
     }
@@ -272,9 +293,7 @@ public class DistanceCalculator {
      * @return Integer with the rough pixels per inch
      */
     private int getPixelsPerInch() {
-        if (mPixelsPerInch < 0) {
-            mPixelsPerInch = calculatePixelsPerInch();
-        }
+        mPixelsPerInch = calculatePixelsPerInch();
         Logger.Write(TAG, "pixelsPerInch: " + mPixelsPerInch);
         return mPixelsPerInch;
     }
@@ -284,11 +303,32 @@ public class DistanceCalculator {
      * @return Returns a float representing distance in inches
      */
     public float getDistanceFromCueToRack() {
-        if (mDistanceFromCueToRack < 0) {
-            mDistanceFromCueToRack = calculateDistanceFromCueToRack();
-        }
-        Logger.Write(TAG, "distanceFromCueToRack: " + mDistanceFromCueToRack);
+        mDistanceFromCueToRack = calculateDistanceFromCueToRack();
+        Logger.WriteLoud(TAG, "distanceFromCueToRack: " + mDistanceFromCueToRack);
         return mDistanceFromCueToRack;
+    }
+
+    /**
+     * Sets the cue ball location for calculations
+     * @param inBallX The X coordinate of the cue ball
+     * @param inBallY The Y coordinate of the cue ball
+     */
+    public void setCueBallLocation(int inBallX, int inBallY) {
+        mBallX = inBallX;
+        Logger.Write(TAG, "Setting ball point");
+        mBallY = inBallY;
+        Logger.Write(TAG, "mBallX: " + mBallX);
+        mBallPoint = new Point(mBallX, mBallY);
+        Logger.Write(TAG, "mBallY: " + mBallY);
+    }
+
+    /**
+     * Method used to change the distance to calculate with
+     * @param inTableType The index of the type of table to use for retrieving distance
+     */
+    public void setTableType(int inTableType) {
+        mDistanceOriginToRack = TableType.Distance[inTableType];
+        getPixelsPerInch();
     }
     //endregion
 }

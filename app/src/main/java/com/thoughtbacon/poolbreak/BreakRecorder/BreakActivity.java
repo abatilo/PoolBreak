@@ -22,31 +22,34 @@
  * SOFTWARE.
  */
 
-package com.thoughtbacon.poolbreak;
+package com.thoughtbacon.poolbreak.BreakRecorder;
 
-import android.util.Log;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.thoughtbacon.poolbreak.Logger;
+import com.thoughtbacon.poolbreak.MainActivity;
+import com.thoughtbacon.poolbreak.R;
 
 /**
  * Created by Aaron on 3/21/2015.
  */
-public class Logger {
-    private static List<String> mLog = new ArrayList<String>();
+public class BreakActivity extends ActionBarActivity {
 
-    public static void WriteLoud(String inTag, String inMessage) {
-        Log.d(inTag, inMessage);
-        String logMessage = String.format("[%s]: %s", inTag, inMessage);
-        mLog.add(logMessage);
-    }
+    private final String TAG = BreakActivity.class.getSimpleName();
 
-    public static void Write(String inTag, String inMessage) {
-        String logMessage = String.format("[%s]: %s", inTag, inMessage);
-        mLog.add(logMessage);
-    }
+    private float mDistance;
+    private final float mDefaultDistance = 0;
 
-    public static List<String> getLog() {
-        return mLog;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_break);
+        Intent intent = getIntent();
+        if (intent != null)
+            mDistance = intent.getFloatExtra(MainActivity.DISTANCE_EXTRA, mDefaultDistance);
+
+        Logger.WriteLoud(TAG, mDistance + "");
     }
 }

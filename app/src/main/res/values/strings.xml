@@ -4,7 +4,9 @@
     <string name="hello_world">Hello world!</string>
 
     <string-array name="size_values">
-        <item>7-ft</item>
-        <item>8-ft</item>
+        <item>7-ft (39" by 78")</item>
+        <item>8-ft (44" by 88")</item>
+        <item>8-ft (46" by 92")</item>
+        <item>9-ft (50" by 100")</item>
     </string-array>
 </resources>
