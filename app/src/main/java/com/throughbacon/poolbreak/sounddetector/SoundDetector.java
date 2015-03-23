@@ -24,9 +24,6 @@
 
 package com.throughbacon.poolbreak.sounddetector;
 
-import org.eazegraph.lib.models.ValueLinePoint;
-import org.eazegraph.lib.models.ValueLineSeries;
-
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.SilenceDetector;
@@ -40,13 +37,9 @@ public class SoundDetector implements AudioProcessor {
 
     private double threshold;
     private SilenceDetector silenceDetector;
-    private ValueLineSeries mValueLineSeries;
-    private boolean allowRead = true;
 
     public SoundDetector() {
         threshold = -70.0;
-        mValueLineSeries = new ValueLineSeries();
-        mValueLineSeries.setColor(0xFF4CAF50);
         silenceDetector = new SilenceDetector(threshold, false);
     }
 
@@ -57,18 +50,13 @@ public class SoundDetector implements AudioProcessor {
     }
 
     private void handleSound() {
-        allowRead = false;
-        mValueLineSeries.addPoint(new ValueLinePoint(Math.abs((float)silenceDetector.currentSPL())));
-        allowRead = true;
+        if (silenceDetector.currentSPL() > threshold) {
+
+        }
     }
 
     public SilenceDetector getSilenceDetector() {
         return silenceDetector;
-    }
-
-    public ValueLineSeries getSeries() {
-        while (!allowRead) { }
-        return mValueLineSeries;
     }
 
     @Override

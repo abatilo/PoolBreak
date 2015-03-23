@@ -40,23 +40,7 @@
         android:text="@string/listening"
         android:layout_gravity="center_horizontal" />
 
-    <org.eazegraph.lib.charts.ValueLineChart
-        android:id="@+id/chart_pitch"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        app:egUseCubic="false"
-        app:egUseOverlapFill="true"
-        app:egUseDynamicScaling="false"
-        app:egShowValueIndicator="false" />
 
-    <org.eazegraph.lib.charts.ValueLineChart
-        android:id="@+id/chart_decibel"
-        android:layout_width="fill_parent"
-        android:layout_height="120dp"
-        app:egUseCubic="false"
-        app:egUseOverlapFill="true"
-        app:egUseDynamicScaling="false"
-        app:egShowValueIndicator="false" />
 
     <Button
         android:id="@+id/button_finished"
