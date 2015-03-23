@@ -68,7 +68,7 @@ public class BreakActivity extends ActionBarActivity {
                 while (true) {
                     stuff();
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(75);
                     }
                     catch (InterruptedException ex) {
 
@@ -100,23 +100,32 @@ public class BreakActivity extends ActionBarActivity {
 
                 // create a dataset and give it a type
                 LineDataSet set1 = new LineDataSet(vals1, "DataSet 1");
-                set1.setDrawCubic(true);
-                set1.setCubicIntensity(0.2f);
-                //set1.setDrawFilled(true);
-                set1.setDrawCircles(false);
-                set1.setLineWidth(2f);
-                set1.setCircleSize(5f);
-                set1.setHighLightColor(Color.rgb(244, 117, 117));
-                set1.setColor(Color.rgb(104, 241, 175));
-                set1.setFillColor(ColorTemplate.getHoloBlue());
 
                 // create a data object with the datasets
                 LineData data = new LineData(xVals, set1);
                 data.setValueTextSize(9f);
+
+                if (data.getDataSets().get(0).getValueCount() > 30) {
+                    xVals.remove(0);
+                    vals1.remove(0);
+                    j = 0;
+                }
+
                 data.setDrawValues(false);
+                set1.setDrawCircles(false);
+                mChart.getXAxis().setEnabled(false);
+                mChart.getAxisLeft().setEnabled(false);
+                mChart.getAxisRight().setEnabled(false);
+                mChart.setDrawGridBackground(false);
+                mChart.setDescription("");
 
                 // set data
                 mChart.setData(data);
+
+                mChart.setDragEnabled(true);
+                mChart.setScaleEnabled(true);
+                mChart.getLegend().setEnabled(false);
+                set1.setDrawFilled(true);
 
                 //mChart.animateY(1);
 
