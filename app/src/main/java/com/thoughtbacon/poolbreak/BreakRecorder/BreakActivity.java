@@ -26,6 +26,7 @@ package com.thoughtbacon.poolbreak.BreakRecorder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
@@ -51,10 +52,17 @@ public class BreakActivity extends ActionBarActivity {
         if (intent != null)
             mDistance = intent.getFloatExtra(MainActivity.DISTANCE_EXTRA, mDefaultDistance);
 
+        PitchTask pitchTask = new PitchTask(this);
+        pitchTask.execute();
+
+
         Button finishedButton = (Button) findViewById(R.id.button_finished);
         finishedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Handler handler = new Handler();
+                DecibelThread decibelThread = new DecibelThread(BreakActivity.this, handler);
+                decibelThread.run();
             }
         });
     }

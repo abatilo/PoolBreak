@@ -24,23 +24,27 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              tools:context="de.eazegraph.app.fragments.ValueLineChartFragment" >
+              android:layout_height="match_parent" >
 
     <TextView
         android:id="@+id/text_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="40dp"
         android:textSize="32sp"
         android:text="@string/listening"
         android:layout_gravity="center_horizontal" />
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart_pitch"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp" />
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart_decibel"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp" />
 
     <Button
         android:id="@+id/button_finished"
