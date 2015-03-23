@@ -76,29 +76,22 @@ public class DecibelThread implements Runnable {
     @Override
     public void run() {
         int i = 0;
-        while (i++ < 5) {
-            mXAxisLabels.add(i + "");
-            mSetValues.add(new Entry(i % 2, i));
+        while (i++ < 10) {
             try {
                 Thread.sleep(1000);
             }
             catch (InterruptedException ex) {
 
             }
-
-            LineDataSet dataSet = new LineDataSet(mSetValues, "Decibels");
+            mXAxisLabels.add(i + "");
+            mSetValues.add(new Entry(i % 2, i));
+            dataSet = new LineDataSet(mSetValues, "Decibels");
             chartData = new LineData(mXAxisLabels, dataSet);
-
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mLineChart.setData(chartData);
-                }
-            });
-
+            mLineChart.setData(chartData);
             dataSet.setDrawValues(false);
             dataSet.setDrawCircles(false);
             dataSet.setDrawFilled(true);
+            mLineChart.invalidate();
         }
     }
 }
