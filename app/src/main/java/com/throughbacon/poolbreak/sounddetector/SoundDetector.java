@@ -24,7 +24,8 @@
 
 package com.throughbacon.poolbreak.sounddetector;
 
-import android.util.Log;
+import org.eazegraph.lib.models.ValueLinePoint;
+import org.eazegraph.lib.models.ValueLineSeries;
 
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
@@ -39,9 +40,13 @@ public class SoundDetector implements AudioProcessor {
 
     private double threshold;
     private SilenceDetector silenceDetector;
+    private ValueLineSeries mValueLineSeries;
+    private boolean allowRead = true;
 
     public SoundDetector() {
-        this.threshold = -70.0;
+        threshold = -70.0;
+        mValueLineSeries = new ValueLineSeries();
+        mValueLineSeries.setColor(0xFF4CAF50);
         silenceDetector = new SilenceDetector(threshold, false);
     }
 
@@ -52,14 +57,18 @@ public class SoundDetector implements AudioProcessor {
     }
 
     private void handleSound() {
-        if (silenceDetector.currentSPL() > threshold) {
-            // TODO Have this method store detected noises for velocity calculations
-            Log.d(TAG, silenceDetector.currentSPL() + "");
-        }
+        allowRead = false;
+        mValueLineSeries.addPoint(new ValueLinePoint(Math.abs((float)silenceDetector.currentSPL())));
+        allowRead = true;
     }
 
     public SilenceDetector getSilenceDetector() {
         return silenceDetector;
+    }
+
+    public ValueLineSeries getSeries() {
+        while (!allowRead) { }
+        return mValueLineSeries;
     }
 
     @Override

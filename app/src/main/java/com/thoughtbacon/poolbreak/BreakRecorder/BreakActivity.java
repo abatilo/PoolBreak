@@ -27,8 +27,9 @@ package com.thoughtbacon.poolbreak.BreakRecorder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
+import android.widget.Button;
 
-import com.thoughtbacon.poolbreak.Logger;
 import com.thoughtbacon.poolbreak.MainActivity;
 import com.thoughtbacon.poolbreak.R;
 
@@ -39,8 +40,10 @@ public class BreakActivity extends ActionBarActivity {
 
     private final String TAG = BreakActivity.class.getSimpleName();
 
-    private float mDistance;
+    private float mDistance = 0;
     private final float mDefaultDistance = 0;
+    private PitchTask mPitchTask;
+    private DecibelTask mDecibelTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,19 @@ public class BreakActivity extends ActionBarActivity {
         if (intent != null)
             mDistance = intent.getFloatExtra(MainActivity.DISTANCE_EXTRA, mDefaultDistance);
 
-        Logger.WriteLoud(TAG, mDistance + "");
+        mPitchTask = new PitchTask(this);
+        mPitchTask.execute();
+
+        mDecibelTask = new DecibelTask(this);
+        mDecibelTask.execute();
+
+        Button finishedButton = (Button) findViewById(R.id.button_finished);
+        finishedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPitchTask.stopDispatcher();
+                mDecibelTask.stopDispatcher();
+            }
+        });
     }
 }

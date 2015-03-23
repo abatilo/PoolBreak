@@ -9,4 +9,7 @@
         <item>8-ft (46" by 92")</item>
         <item>9-ft (50" by 100")</item>
     </string-array>
+
+    <string name="listening">Listening...</string>
+    <string name="button_finished">Finished</string>
 </resources>
