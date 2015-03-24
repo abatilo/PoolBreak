@@ -39,12 +39,12 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart_pitch"
         android:layout_width="fill_parent"
-        android:layout_height="200dp" />
+        android:layout_height="120dp" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart_decibel"
         android:layout_width="fill_parent"
-        android:layout_height="200dp" />
+        android:layout_height="120dp" />
 
     <Button
         android:id="@+id/button_finished"

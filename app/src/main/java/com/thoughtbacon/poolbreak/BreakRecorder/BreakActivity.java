@@ -32,14 +32,16 @@ import android.view.View;
 import android.widget.Button;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.thoughtbacon.poolbreak.Logger;
 import com.thoughtbacon.poolbreak.MainActivity;
 import com.thoughtbacon.poolbreak.R;
-
-import java.util.ArrayList;
 
 /**
  * Created by Aaron on 3/21/2015.
@@ -51,6 +53,8 @@ public class BreakActivity extends ActionBarActivity {
     private float mDistance = 0;
     private final float mDefaultDistance = 0;
 
+    private LineChart mChart;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,120 +63,141 @@ public class BreakActivity extends ActionBarActivity {
         if (intent != null)
             mDistance = intent.getFloatExtra(MainActivity.DISTANCE_EXTRA, mDefaultDistance);
 
-        PitchTask pitchTask = new PitchTask(this);
-        pitchTask.execute();
+        mChart = (LineChart) findViewById(R.id.chart_decibel);
 
+        // no description text
+        mChart.setDescription("");
+        mChart.setNoDataTextDescription("You need to provide data for the chart.");
+
+        // enable value highlighting
+        mChart.setHighlightEnabled(true);
+
+        // enable touch gestures
+        mChart.setTouchEnabled(true);
+
+        // enable scaling and dragging
+        mChart.setDragEnabled(true);
+        mChart.setScaleEnabled(true);
+        mChart.setDrawGridBackground(false);
+
+        // if disabled, scaling can be done on x- and y-axis separately
+        mChart.setPinchZoom(true);
+
+        // set an alternative background color
+        mChart.setBackgroundColor(Color.LTGRAY);
+
+        LineData data = new LineData();
+        data.setValueTextColor(Color.WHITE);
+
+        // add empty data
+        mChart.setData(data);
+
+        // get the legend (only possible after setting data)
+        Legend l = mChart.getLegend();
+
+        // modify the legend ...
+        // l.setPosition(LegendPosition.LEFT_OF_CHART);
+        l.setForm(Legend.LegendForm.LINE);
+        l.setTextColor(Color.WHITE);
+
+        XAxis xl = mChart.getXAxis();
+        xl.setTextColor(Color.WHITE);
+        xl.setDrawGridLines(false);
+        xl.setAvoidFirstLastClipping(true);
+
+        YAxis leftAxis = mChart.getAxisLeft();
+        leftAxis.setTextColor(Color.WHITE);
+        leftAxis.setAxisMaxValue(120f);
+        leftAxis.setDrawGridLines(true);
+
+        YAxis rightAxis = mChart.getAxisRight();
+        rightAxis.setEnabled(false);
+
+        final DecibelThread d = new DecibelThread(this);
+
+        Button b = (Button) findViewById(R.id.button_finished);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startDecibelThread();
+                //BreakActivity.this.runOnUiThread(d);
+                //addEntry();
+            }
+        });
+    }
+
+    private void startDecibelThread() {
+        final DecibelThread decibelThread = new DecibelThread(this);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    stuff();
-                    try {
-                        Thread.sleep(75);
-                    }
-                    catch (InterruptedException ex) {
-
-                    }
+                for (int i = 0; i < 500; i++) {
+                    BreakActivity.this.runOnUiThread(decibelThread);
+                    sleep(25);
                 }
             }
         }).start();
-
-        Button finishedButton = (Button) findViewById(R.id.button_finished);
-        finishedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-//                Handler handler = new Handler();
-//                DecibelThread decibelRunnable = new DecibelThread(BreakActivity.this, handler);
-//                BreakActivity.this.runOnUiThread(decibelRunnable);
-            }
-        });
     }
 
-    void stuff() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mChart = (LineChart) findViewById(R.id.chart_decibel);
+    private int year = 15;
+    String[] mMonths = new String[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec" };
 
-                xVals.add((j) + "");
-                vals1.add(new Entry((float) (Math.random() * j) + 20, j++));
+    private void addEntry() {
 
-                // create a dataset and give it a type
-                LineDataSet set1 = new LineDataSet(vals1, "DataSet 1");
+        LineData data = mChart.getData();
 
-                // create a data object with the datasets
-                LineData data = new LineData(xVals, set1);
-                data.setValueTextSize(9f);
+        if (data != null) {
 
-                if (data.getDataSets().get(0).getValueCount() > 30) {
-                    xVals.remove(0);
-                    vals1.remove(0);
-                    j = 0;
-                }
+            LineDataSet set = data.getDataSetByIndex(0);
+            // set.addEntry(...); // can be called as well
 
-                data.setDrawValues(false);
-                set1.setDrawCircles(false);
-                mChart.getXAxis().setEnabled(false);
-                mChart.getAxisLeft().setEnabled(false);
-                mChart.getAxisRight().setEnabled(false);
-                mChart.setDrawGridBackground(false);
-                mChart.setDescription("");
-
-                // set data
-                mChart.setData(data);
-
-                mChart.setDragEnabled(true);
-                mChart.setScaleEnabled(true);
-                mChart.getLegend().setEnabled(false);
-                set1.setDrawFilled(true);
-
-                //mChart.animateY(1);
-
-                mChart.invalidate();
+            if (set == null) {
+                set = createSet();
+                data.addDataSet(set);
             }
-        });
+
+            Logger.WriteLoud(TAG, data.getXValCount() + "");
+            // add a new x-value first
+            data.addXValue(mMonths[data.getXValCount() % 12] + " "
+                    + (year + data.getXValCount() / 12));
+            data.addEntry(new Entry((float) (Math.random() * 40) + 40f, set.getEntryCount()), 0);
+
+            // let the chart know it's data has changed
+            mChart.notifyDataSetChanged();
+
+            // limit the number of visible entries
+            mChart.setVisibleXRange(6);
+            // mChart.setVisibleYRange(30, AxisDependency.LEFT);
+
+            // move to the latest entry
+            mChart.moveViewToX(data.getXValCount() - 7);
+
+            // this automatically refreshes the chart (calls invalidate())
+            // mChart.moveViewTo(data.getXValCount()-7, 55f,
+            // AxisDependency.LEFT);
+
+            // redraw the chart
+            // mChart.invalidate();
+        }
     }
 
-    private LineChart mChart;
-    ArrayList<String> xVals = new ArrayList<String>();
-    ArrayList<Entry> vals1 = new ArrayList<Entry>();
-    int j = 0;
+    private LineDataSet createSet() {
 
-    private void setData(int count, float range) {
-        mChart = (LineChart) findViewById(R.id.chart_decibel);
+        LineDataSet set = new LineDataSet(null, "Dynamic Data");
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColor(ColorTemplate.getHoloBlue());
+        set.setCircleColor(ColorTemplate.getHoloBlue());
+        set.setLineWidth(2f);
+        set.setCircleSize(4f);
+        set.setFillAlpha(65);
+        set.setFillColor(ColorTemplate.getHoloBlue());
+        set.setHighLightColor(Color.rgb(244, 117, 117));
+        set.setValueTextColor(Color.WHITE);
+        set.setValueTextSize(10f);
+        return set;
+    }
 
-        for (int i = 0; i < count; i++) {
-            xVals.add((1990 +i) + "");
-        }
-
-
-        for (int i = 0; i < count; i++) {
-            float mult = (range + 1);
-            float val = (float) (Math.random() * mult) + 20;// + (float)
-            // ((mult *
-            // 0.1) / 10);
-            vals1.add(new Entry(val, i));
-        }
-
-        // create a dataset and give it a type
-        LineDataSet set1 = new LineDataSet(vals1, "DataSet 1");
-        set1.setDrawCubic(true);
-        set1.setCubicIntensity(0.2f);
-        //set1.setDrawFilled(true);
-        set1.setDrawCircles(false);
-        set1.setLineWidth(2f);
-        set1.setCircleSize(5f);
-        set1.setHighLightColor(Color.rgb(244, 117, 117));
-        set1.setColor(Color.rgb(104, 241, 175));
-        set1.setFillColor(ColorTemplate.getHoloBlue());
-
-        // create a data object with the datasets
-        LineData data = new LineData(xVals, set1);
-        data.setValueTextSize(9f);
-        data.setDrawValues(false);
-
-        // set data
-        mChart.setData(data);
+    private void sleep(int ms) {
+        try { Thread.sleep(ms); } catch (InterruptedException ex) { }
     }
 }

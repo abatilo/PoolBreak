@@ -304,7 +304,7 @@ public class DistanceCalculator {
      */
     public float getDistanceFromCueToRack() {
         mDistanceFromCueToRack = calculateDistanceFromCueToRack();
-        Logger.WriteLoud(TAG, "distanceFromCueToRack: " + mDistanceFromCueToRack);
+        Logger.Write(TAG, "distanceFromCueToRack: " + mDistanceFromCueToRack);
         return mDistanceFromCueToRack;
     }
 
