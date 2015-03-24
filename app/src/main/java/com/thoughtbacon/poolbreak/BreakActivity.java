@@ -36,6 +36,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.throughbacon.poolbreak.sounddetector.SoundDetector;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -81,7 +82,9 @@ public class BreakActivity extends ActionBarActivity {
 
                     TextView listening = (TextView) findViewById(R.id.text_status);
                     TextView ellipses = (TextView) findViewById(R.id.text_ellipses);
-                    listening.setText(calculateVelocity(timeDelta) + "");
+                    double velocity = calculateVelocity(timeDelta);
+                    DecimalFormat df = new DecimalFormat("#.##");
+                    listening.setText(df.format(velocity));
                     ellipses.setText(" mph");
                 }
             }
@@ -91,14 +94,14 @@ public class BreakActivity extends ActionBarActivity {
         loadAd();
     }
 
-    private float calculateVelocity(float inDelta) {
+    private double calculateVelocity(float inDelta) {
         float milliseconds = inDelta / 1000000;
         float feet = mDistance / 12;
         float miles = feet / 5280;
         float seconds = milliseconds / 1000;
         float minutes = seconds / 60;
         float hours = minutes / 60;
-        float velocity = miles / hours;
+        double velocity = miles / hours;
 
         Logger.WriteLoud(TAG, "Velocity: " + velocity + " mph");
         return velocity;
