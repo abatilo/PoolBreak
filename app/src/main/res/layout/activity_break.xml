@@ -23,41 +23,58 @@
   ~ SOFTWARE.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:ads="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/text_status"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="32sp"
-        android:text="@string/listening"
-        android:layout_gravity="center_horizontal" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id" />
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart_pitch"
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="120dp" />
+        android:layout_height="200dp"
+        android:padding="80dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/adView" >
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart_decibel"
-        android:layout_width="fill_parent"
-        android:layout_height="120dp" />
+        <TextView
+            android:id="@+id/text_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:text="@string/listening" />
+
+        <TextView
+            android:id="@+id/text_ellipses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:text=""/>
+
+    </LinearLayout>
+
+
 
     <Button
         android:id="@+id/button_finished"
         android:layout_width="250dp"
         android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="30dp"
         android:background="@drawable/btn_outline_default"
         android:fontFamily="sans-serif-light"
         android:textSize="28sp"
         android:textColor="@color/white"
         android:text="@string/button_finished"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
 
-</LinearLayout>
+</RelativeLayout>

@@ -10,6 +10,8 @@
         <item>9-ft (50" by 100")</item>
     </string-array>
 
-    <string name="listening">Listening...</string>
+    <string name="listening">Listening</string>
     <string name="button_finished">Finished</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 </resources>

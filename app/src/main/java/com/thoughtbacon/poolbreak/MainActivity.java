@@ -36,7 +36,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.thoughtbacon.poolbreak.BreakRecorder.BreakActivity;
 
 public class MainActivity extends ActionBarActivity {
 

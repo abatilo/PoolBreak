@@ -24,6 +24,10 @@
 
 package com.throughbacon.poolbreak.sounddetector;
 
+import com.thoughtbacon.poolbreak.Logger;
+
+import java.util.ArrayList;
+
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.SilenceDetector;
@@ -37,6 +41,9 @@ public class SoundDetector implements AudioProcessor {
 
     private double threshold;
     private SilenceDetector silenceDetector;
+    private ArrayList<Long> mNoiseTimes = new ArrayList<Long>();
+
+    private final long REPEAT_THRESHOLD = 90000000;
 
     public SoundDetector() {
         threshold = -70.0;
@@ -51,12 +58,30 @@ public class SoundDetector implements AudioProcessor {
 
     private void handleSound() {
         if (silenceDetector.currentSPL() > threshold) {
+            if (mNoiseTimes.size() > 0) {
 
+                long currentTime = System.nanoTime();
+                long previousTime = mNoiseTimes.get(mNoiseTimes.size() - 1);
+                long delta = currentTime - previousTime;
+
+                if (delta > REPEAT_THRESHOLD) {
+                    mNoiseTimes.add(currentTime);
+                    Logger.WriteLoud(TAG, mNoiseTimes.size() + "");
+                }
+            }
+            else {
+                mNoiseTimes.add(System.nanoTime());
+                Logger.WriteLoud(TAG, mNoiseTimes.size() + "");
+            }
         }
     }
 
     public SilenceDetector getSilenceDetector() {
         return silenceDetector;
+    }
+
+    public ArrayList<Long> getNoises() {
+        return mNoiseTimes;
     }
 
     @Override
