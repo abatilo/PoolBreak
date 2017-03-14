@@ -32,8 +32,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.throughbacon.poolbreak.sounddetector.SoundDetector;
 
 import java.text.DecimalFormat;
@@ -53,7 +51,6 @@ public class BreakActivity extends ActionBarActivity {
     private final float mDefaultDistance = 0;
 
     private boolean isFinished = false;
-    private AdView mAdView;
 
     private SoundDetector mDetector = new SoundDetector();
     private AudioDispatcher mDispatcher;
@@ -91,7 +88,6 @@ public class BreakActivity extends ActionBarActivity {
         });
 
         startDispatcher();
-        loadAd();
     }
 
     private double calculateVelocity(float inDelta) {
@@ -117,22 +113,6 @@ public class BreakActivity extends ActionBarActivity {
 
         mDispatcherThread = new Thread(mDispatcher);
         mDispatcherThread.start();
-    }
-
-    private void loadAd() {
-        // Gets the ad view defined in layout/ad_fragment.xml with ad unit ID set in
-        // values/strings.xml.
-        mAdView = (AdView) findViewById(R.id.adView);
-
-        // Create an ad request. Check logcat output for the hashed device ID to
-        // get test ads on a physical device. e.g.
-        // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-
-        // Start loading the ad in the background.
-        mAdView.loadAd(adRequest);
     }
 
     private void updateListening() {
